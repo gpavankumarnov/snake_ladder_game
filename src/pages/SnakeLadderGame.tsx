@@ -15,83 +15,87 @@ const SnakeLadderGame = () => {
     playerB: 0,
   });
 
-  useEffect(()=>{
-   if(numberDisplay >0){
-    playerCountSet(player);
-    calculateWinner();
-    setPlayer(!player);
-   }
-  },[numberDisplay])
-
-  const calculateWinner = ()=>{
-    const playerPositionAfterRoll = play(player ? playerCount.playerA : playerCount.playerB, numberDisplay);
-    console.log("player position after roll", playerPositionAfterRoll);
-
-    if(playerPositionAfterRoll){    
-    setPlayerCount((prev) => ({
-        ...prev,
-        playerA:
-          player
-            ?  playerPositionAfterRoll
-            : prev.playerA,
-        playerB:
-          !player
-            ? playerPositionAfterRoll
-            : prev.playerB,
-      }));
+  useEffect(() => {
+    if (numberDisplay > 0) {
+      playerCountSet(player);
+      setPlayer(!player);
+      calculateWinner()
     }
-  }
+  }, [numberDisplay]);
 
-  const playerCountSet = (player: boolean) => {
-   
-    setPlayerCount((prev) => ({
-      ...prev,
-      playerA:
-        player
-          ? prev.playerA + numberDisplay
-          : prev.playerA,
-      playerB:
-        !player
-          ? prev.playerB + numberDisplay
-          : prev.playerB,
-    }));
+const calculateWinner = () => {
   
+  if(playerCount.playerA === 100){
+    return  "Player A is winner" 
+  } 
+  if(playerCount.playerB === 100){
+    return  "Player B is winner" 
+  } 
+   return null;  
+}
+const winner = calculateWinner();
+  /**
+      after you roll the dice -> numberDisplay
+      you have to update the player count and at the same time you have to 
+      check where there is any ladder or snake and update player count.
+   */
+  const playerCountSet = (player: boolean) => {
+    setPlayerCount((prev) => {
+      //update the player count
+      const getCurrentCount = player ? prev.playerA : prev.playerB;
+      let playerCount = getCurrentCount + numberDisplay;
+
+      // Prevent player from exceeding 100
+      if (playerCount > 100) {
+        playerCount = getCurrentCount;
+      }
+   
+      //check any ladder or snake available
+      const newPosition = checkSnakeOrLadderAtPosition(playerCount);
+
+      return {
+        ...prev,
+        playerA: player ? newPosition : prev.playerA,
+        playerB: !player ? newPosition : prev.playerB,
+      };
+    });
   };
 
-  function play(player:number, numberDisplay:number) {
-    // Prevent player from exceeding 100
-    if (player > 100) {
-        player -= numberDisplay;
-    }
-
+  function checkSnakeOrLadderAtPosition(newPosition: number): number {
     // Snakes and Ladders mapping
     const positions = {
-        1: 38,  4: 14,  8: 30,  21: 42,  28: 76,  50: 67,
-        71: 92, 80: 99, 32: 10, 36: 6,  48: 26,  62: 18, 
-        88: 24, 95: 56, 97: 78
+      1: 38,
+      4: 14,
+      8: 30,
+      21: 42,
+      28: 76,
+      50: 67,
+      71: 92,
+      80: 99,
+      32: 10,
+      36: 6,
+      48: 26,
+      62: 18,
+      88: 24,
+      95: 56,
+      97: 78,
     };
 
     // Check if player landed on a snake/ladder
-    return positions[player];
-}
-
+    return positions[newPosition] || newPosition;
+  }
 
   const handleRollClick = () => {
-    
-      setNumberDisplay(getRandomNumber());
-      
-      
-    
-   
+    setNumberDisplay(getRandomNumber());
   };
   console.log("playerCount", playerCount);
 
   return (
     <div className="d-flex flex-column gap-3">
       <h2>Snake-ladder game</h2>
-      <h4>Next Player{player ? " A" : " B"}</h4>
+      {winner ? <h3 style={{ color: "green" }}>{winner}</h3> : <h4>Next Player: {player ? "A" : "B"}</h4>}
       <h3>{numberDisplay}</h3>
-      <Button onClick={handleRollClick}>Roll</Button>
+      {!winner && <Button onClick={handleRollClick}>Roll</Button>}
     </div>
   );
 };

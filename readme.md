@@ -1,5 +1,6 @@
 ![alt text](image-1.png)
 
+
 when button is clicked
 get random number from 1 to 6 -> Math.floor(Math.random()*6+1) -> 1,2,3,4,5,6
 change the players turn now.
@@ -49,5 +50,5 @@ when player landed on ladder then we have to update the player position immediat
 sol:
 using useEffect 
 fist retriving the random number and updating its value to state.
-in useeffect, we call playerCount set.
-also we pass number as deps.
+in useeffect, we call playerCount set which cause to state gets updated.
+but the calculatewinner
